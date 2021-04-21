@@ -6,6 +6,8 @@ use std::io;
 use std::io::Read;
 use std::collections::HashSet;
 
+const GPIO_PATH: &str = "/home/buuhuu/dev/rust/bbb/gpioctl/";
+
 fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() < 4 {
@@ -39,7 +41,7 @@ fn main() {
 
     let mut available_modes_gpio: Vec<&Mode> = vec![];
     
-    // Check if specified GPIO is available
+    // Check if specified GPIO is available and get modes
     let gpio_iter = available_gpios.iter();
     let mut gpio_found = false;
     for val in gpio_iter {
@@ -56,8 +58,9 @@ fn main() {
         print_information("Invalid GPIO");
         return;
     }
+    let s = read_gpio("gpio01");
 
-    println!("{}", available_modes_gpio[2]);
+    
 
 
 
@@ -79,7 +82,9 @@ fn read_file(path: &str) -> String {
 */
 
 fn read_gpio(gpio: &str) -> Result<String, io::Error> {
-    let f = File::open(gpio);
+    let path: String = format!("{}{}", GPIO_PATH, gpio);
+    println!("{}", path);
+    let f = File::open(path);
     let mut f = match f {
         Ok(file) => file,
         Err(e)   => return Err(e)
