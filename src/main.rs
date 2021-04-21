@@ -1,5 +1,6 @@
 use std::env;
 
+use std::fmt;
 use std::fs::File;
 use std::io;
 use std::io::Read;
@@ -36,12 +37,18 @@ fn main() {
     };
     */
 
+    let mut available_modes_gpio: Vec<&Mode> = vec![];
+    
     // Check if specified GPIO is available
     let gpio_iter = available_gpios.iter();
     let mut gpio_found = false;
     for val in gpio_iter {
         if gpio == val.name {
             gpio_found = true;
+            let mode_iter = val.modes.iter();
+            for mode in mode_iter {
+                available_modes_gpio.push(mode);
+            }
             break;
         }
     }
@@ -50,6 +57,7 @@ fn main() {
         return;
     }
 
+    println!("{}", available_modes_gpio[2]);
 
 
 
@@ -96,6 +104,16 @@ enum Mode {
     Direction,
     Value,
     Label
+}
+
+impl fmt::Display for Mode {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+       match *self {
+           Mode::Direction => write!(f, "Direction"),
+           Mode::Value     => write!(f, "Value"),
+           Mode::Label     => write!(f, "Label")
+       }
+    }
 }
 
 struct Gpio {
