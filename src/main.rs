@@ -1,18 +1,29 @@
 use std::env;
 
 use std::fs::File;
-use std::io::prelude::*;
 use std::io;
 use std::io::Read;
-use std::path::Path;
+use std::collections::HashSet;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() < 4 {
-        println!("Specify at least 3 Arguments");
+        print_standard_error();
         return;
     }
-    
+
+    let mut available_gpios: HashSet<String> = HashSet::new();
+    available_gpios.insert("gpio01".to_string());
+    available_gpios.insert("gpio02".to_string());
+
+    let gpio: &str = &args[1];
+    let function: &str = &args[2];
+    let mode: &str = &args[3];
+
+    if !available_gpios.contains(gpio) {
+        print_information("Invalid GPIO specified")
+    }
+
 
 }
 /*
@@ -45,8 +56,10 @@ fn read_gpio(gpio: &str) -> Result<String, io::Error> {
     }
 }
 
+fn print_information(message: &str) {
+    println!("[BUSCTL] {}", message);
+}
 
-enum AvailableGpios {
-    gpio01,
-    gpio02
+fn print_standard_error() {
+    print_information("Specify at least 3 Arguments");
 }
