@@ -12,17 +12,45 @@ fn main() {
         return;
     }
 
-    let mut available_gpios: HashSet<String> = HashSet::new();
-    available_gpios.insert("gpio01".to_string());
-    available_gpios.insert("gpio02".to_string());
+    let mut available_gpios: Vec<Gpio> = vec![];
+    available_gpios.push(
+        Gpio::new(String::from("gpio01"), 1, vec![Mode::Direction, Mode::Value])
+    );
+    available_gpios.push(
+        Gpio::new(String::from("gpio02"), 2, vec![Mode::Direction, Mode::Value, Mode::Label])
+    );
 
     let gpio: &str = &args[1];
     let function: &str = &args[2];
     let mode: &str = &args[3];
 
-    if !available_gpios.contains(gpio) {
-        print_information("Invalid GPIO specified")
+    /*
+    let mode = match function {
+        "direction" => Mode::Direction,
+        "value"     => Mode::Value,
+        "label"     => Mode::Label,
+        _           => {
+            print_information("Wrong method");
+            return;
+        }
+    };
+    */
+
+    // Check if specified GPIO is available
+    let gpio_iter = available_gpios.iter();
+    let mut gpio_found = false;
+    for val in gpio_iter {
+        if gpio == val.name {
+            gpio_found = true;
+            break;
+        }
     }
+    if !gpio_found {
+        print_information("Invalid GPIO");
+        return;
+    }
+
+
 
 
 }
@@ -62,4 +90,27 @@ fn print_information(message: &str) {
 
 fn print_standard_error() {
     print_information("Specify at least 3 Arguments");
+}
+
+enum Mode {
+    Direction,
+    Value,
+    Label
+}
+
+struct Gpio {
+    name: String,
+    number: i32,
+    modes: Vec<Mode>
+}
+
+impl Gpio {
+    fn new(name: String, number: i32, modes: Vec<Mode>) -> Gpio {
+        let gpio: Gpio = Gpio {
+            name: name,
+            number: number,
+            modes: modes
+        };
+        return gpio;
+    }
 }
