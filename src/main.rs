@@ -24,8 +24,12 @@ fn main() {
     );
 
     let gpio: &str = &args[1];
-    let function: &str = &args[2];
-    let mode: &str = &args[3];
+    let mode: &str = &args[2];
+    let function: &str = &args[3];
+    let mut set_expression: &str = "";
+    if args.len() > 4 {
+        set_expression = &args[4];
+    }
 
     /*
     let mode = match function {
@@ -58,10 +62,41 @@ fn main() {
         print_information("Invalid GPIO");
         return;
     }
-    let s = read_gpio("gpio01");
-
     
+    if function != "get" && function != "set" {
+        print_information("Invalid Function");
+        return;
+    }
 
+    let res: String;
+    if function == "get" {
+        if mode == "direction" {
+            res = get_direction(gpio);
+        } else if mode == "value" {
+            res = get_value(gpio);
+        } else if mode == "label" {
+            res = get_label(gpio);
+        }
+    } else if function == "set" {
+        if mode == "direction" {
+            if set_expression != "in" && set_expression != "out" {
+                print_information("Please use [in] or [out]");
+                return;
+            }
+            set_direction(gpio, set_expression);
+        }
+        else if mode == "value" {
+            match set_expression.parse::<i32>() {
+                Ok(n) => set_value(gpio, n),
+                Err(e) => {
+                    print_information("Please specify a number");
+                    return;
+                }
+            }
+        }
+    } else {
+        print_information("Wrong function");
+    }
 
 
 }
@@ -83,7 +118,6 @@ fn read_file(path: &str) -> String {
 
 fn read_gpio(gpio: &str) -> Result<String, io::Error> {
     let path: String = format!("{}{}", GPIO_PATH, gpio);
-    println!("{}", path);
     let f = File::open(path);
     let mut f = match f {
         Ok(file) => file,
@@ -95,6 +129,29 @@ fn read_gpio(gpio: &str) -> Result<String, io::Error> {
         Ok(_)  => Ok(s),
         Err(e) => Err(e)
     }
+}
+
+fn get_direction(gpio: &str) -> String {
+    println!("Called set_direction for GPIO {}", gpio);
+    return String::new();
+}
+
+fn set_direction(gpio: &str, direction: &str) {
+    println!("Called set_direction for GPIO {}, Direction: {}", gpio, direction);
+}
+
+fn get_value(gpio: &str) -> String {
+    println!("Calles get_value for GPIO {}", gpio);
+    return String::new();
+}
+
+fn set_value(gpio: &str, value: i32) {
+    println!("Calles set_value for GPIO {}", gpio);
+}
+
+fn get_label(gpio: &str) -> String {
+    println!("Calles get_label for GPIO {}", gpio);
+    return String::new();
 }
 
 fn print_information(message: &str) {
