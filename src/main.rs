@@ -76,6 +76,9 @@ fn main() {
             res = get_value(gpio);
         } else if mode == "label" {
             res = get_label(gpio);
+        } else {
+            print_information("Please specify a correct mode");
+            return;
         }
     } else if function == "set" {
         if mode == "direction" {
@@ -93,6 +96,9 @@ fn main() {
                     return;
                 }
             }
+        } else {
+            print_information("Please specify correct mode");
+            return;
         }
     } else {
         print_information("Wrong function");
@@ -100,21 +106,6 @@ fn main() {
 
 
 }
-/*
-fn read_file(path: &str) -> String {
-    let path = Path::new(path);
-    let display = path.display();
-
-    let mut file = match File::open(&path) {
-        Err(why) => panic!("couldn't open {}: {}", display, why),
-        Ok(file) => file,
-    };
-
-    let mut s = String::new();
-    file.read_to_string(&mut s).expect("Error reading file!");
-    return s;
-}
-*/
 
 fn read_gpio(gpio: &str) -> Result<String, io::Error> {
     let path: String = format!("{}{}", GPIO_PATH, gpio);
@@ -133,7 +124,7 @@ fn read_gpio(gpio: &str) -> Result<String, io::Error> {
 
 fn get_direction(gpio: &str) -> String {
     println!("Called set_direction for GPIO {}", gpio);
-    return String::new();
+    String::new()
 }
 
 fn set_direction(gpio: &str, direction: &str) {
@@ -141,17 +132,17 @@ fn set_direction(gpio: &str, direction: &str) {
 }
 
 fn get_value(gpio: &str) -> String {
-    println!("Calles get_value for GPIO {}", gpio);
-    return String::new();
+    println!("Called get_value for GPIO {}", gpio);
+    String::new()
 }
 
 fn set_value(gpio: &str, value: i32) {
-    println!("Calles set_value for GPIO {}", gpio);
+    println!("Called set_value for GPIO {}", gpio);
 }
 
 fn get_label(gpio: &str) -> String {
-    println!("Calles get_label for GPIO {}", gpio);
-    return String::new();
+    println!("Called get_label for GPIO {}", gpio);
+    String::new()
 }
 
 fn print_information(message: &str) {
@@ -191,6 +182,6 @@ impl Gpio {
             number: number,
             modes: modes
         };
-        return gpio;
+        gpio
     }
 }
