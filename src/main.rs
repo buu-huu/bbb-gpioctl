@@ -91,8 +91,6 @@ fn main() {
     } else {
         print_information("Wrong function");
     }
-
-
 }
 
 fn read_gpio(gpio: &str) -> Result<String, io::Error> {
@@ -100,13 +98,13 @@ fn read_gpio(gpio: &str) -> Result<String, io::Error> {
     let f = File::open(path);
     let mut f = match f {
         Ok(file) => file,
-        Err(e)   => return Err(e)
+        Err(e)   => return Err(e),
     };
 
     let mut s = String::new();
     match f.read_to_string(&mut s) {
         Ok(_)  => Ok(s),
-        Err(e) => Err(e)
+        Err(e) => Err(e),
     }
 }
 
@@ -144,7 +142,7 @@ fn print_standard_error() {
 enum Mode {
     Direction,
     Value,
-    Label
+    Label,
 }
 
 impl fmt::Display for Mode {
@@ -152,7 +150,7 @@ impl fmt::Display for Mode {
        match *self {
            Mode::Direction => write!(f, "Direction"),
            Mode::Value     => write!(f, "Value"),
-           Mode::Label     => write!(f, "Label")
+           Mode::Label     => write!(f, "Label"),
        }
     }
 }
@@ -160,7 +158,7 @@ impl fmt::Display for Mode {
 struct Gpio {
     name: String,
     number: i32,
-    modes: Vec<Mode>
+    modes: Vec<Mode>,
 }
 
 impl Gpio {
@@ -168,7 +166,7 @@ impl Gpio {
         let gpio: Gpio = Gpio {
             name: name,
             number: number,
-            modes: modes
+            modes: modes,
         };
         gpio
     }
