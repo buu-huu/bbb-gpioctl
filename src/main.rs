@@ -31,18 +31,6 @@ fn main() {
         set_expression = &args[4];
     }
 
-    /*
-    let mode = match function {
-        "direction" => Mode::Direction,
-        "value"     => Mode::Value,
-        "label"     => Mode::Label,
-        _           => {
-            print_information("Wrong method");
-            return;
-        }
-    };
-    */
-
     let mut available_modes_gpio: Vec<&Mode> = vec![];
     
     // Check if specified GPIO is available and get modes
