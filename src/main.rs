@@ -1,3 +1,8 @@
+/*
+ * GPIOCTL 
+ * Provides functions to interact with the GPIOs of the BeagleBoneBlack
+ */
+
 use std::env;
 
 use std::fmt;
@@ -6,7 +11,11 @@ use std::io;
 use std::io::Read;
 use std::collections::HashSet;
 
-const GPIO_PATH: &str = "/home/buuhuu/dev/rust/bbb/gpioctl/";
+const GPIO_PATH: &str = "/home/buuhuu/dev/rust/bbb/gpioctl";
+
+/*
+ * gpioctl gpio01 [direction|value|label] [get|set]
+ */
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -60,6 +69,7 @@ fn main() {
     if function == "get" {
         if mode == "direction" {
             res = get_direction(gpio);
+            println!("{}", res);
         } else if mode == "value" {
             res = get_value(gpio);
         } else if mode == "label" {
@@ -93,24 +103,22 @@ fn main() {
     }
 }
 
-fn read_gpio(gpio: &str) -> Result<String, io::Error> {
-    let path: String = format!("{}{}", GPIO_PATH, gpio);
+fn read_file(path: String) -> String {
     let f = File::open(path);
     let mut f = match f {
         Ok(file) => file,
-        Err(e)   => return Err(e),
+        Err(e)   => panic!("Error reading GPIO file"),
     };
 
     let mut s = String::new();
-    match f.read_to_string(&mut s) {
-        Ok(_)  => Ok(s),
-        Err(e) => Err(e),
-    }
+    f.read_to_string(&mut s).expect("Error reading GPIO file");
+    s
 }
 
 fn get_direction(gpio: &str) -> String {
-    println!("Called set_direction for GPIO {}", gpio);
-    String::new()
+    let path: String = format!("{}/{}/{}", GPIO_PATH, gpio, "direction");
+    let res = read_file(path);
+    res
 }
 
 fn set_direction(gpio: &str, direction: &str) {
@@ -118,7 +126,8 @@ fn set_direction(gpio: &str, direction: &str) {
 }
 
 fn get_value(gpio: &str) -> String {
-    println!("Called get_value for GPIO {}", gpio);
+    //let res = read_gpio(gpio);
+    //res
     String::new()
 }
 
