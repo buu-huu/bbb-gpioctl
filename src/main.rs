@@ -1,21 +1,18 @@
 /*
  * GPIOCTL 
  * Provides functions to interact with the GPIOs of the BeagleBoneBlack
+ * Example call: gpioctl gpio01 [direction|value|label] [get|set]
  */
 
 use std::env;
 
 use std::fmt;
 use std::fs::File;
-use std::io;
+use std::fs;
 use std::io::Read;
-use std::collections::HashSet;
+use std::path::Path;
 
 const GPIO_PATH: &str = "/home/buuhuu/dev/rust/bbb/gpioctl";
-
-/*
- * gpioctl gpio01 [direction|value|label] [get|set]
- */
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -24,6 +21,7 @@ fn main() {
         return;
     }
 
+    // Todo: Create Parser for available GPIOs from JSON file
     let mut available_gpios: Vec<Gpio> = vec![];
     available_gpios.push(
         Gpio::new(String::from("gpio01"), 1, vec![Mode::Direction, Mode::Value])
@@ -72,8 +70,10 @@ fn main() {
             println!("{}", res);
         } else if mode == "value" {
             res = get_value(gpio);
+            println!("{}", res);
         } else if mode == "label" {
             res = get_label(gpio);
+            println!("{}", res);
         } else {
             print_information("Please specify a correct mode");
             return;
@@ -87,9 +87,15 @@ fn main() {
             set_direction(gpio, set_expression);
         }
         else if mode == "value" {
-            match set_expression.parse::<i32>() {
-                Ok(n) => set_value(gpio, n),
-                Err(e) => {
+            match set_expression.parse::<f32>() {
+                Ok(n) => {
+                    if n > 5.0 || n < 0.0 {
+                        print_information("Value must be between 0 and 5");
+                        return;
+                    }
+                    set_value(gpio, n)
+                },
+                Err(_) => {
                     print_information("Please specify a number");
                     return;
                 }
@@ -107,7 +113,7 @@ fn read_file(path: String) -> String {
     let f = File::open(path);
     let mut f = match f {
         Ok(file) => file,
-        Err(e)   => panic!("Error reading GPIO file"),
+        Err(_)   => panic!("Error reading GPIO file"),
     };
 
     let mut s = String::new();
@@ -122,22 +128,33 @@ fn get_direction(gpio: &str) -> String {
 }
 
 fn set_direction(gpio: &str, direction: &str) {
-    println!("Called set_direction for GPIO {}, Direction: {}", gpio, direction);
+    let path: String = format!("{}/{}/{}", GPIO_PATH, gpio, "direction");
+    if !Path::new(&path).exists() {
+        print_information("Can't write to GPIO file. Direction file does not exist");
+        return;
+    }
+    fs::write(&path, direction).expect("Error writing GPIO file");
 }
 
 fn get_value(gpio: &str) -> String {
-    //let res = read_gpio(gpio);
-    //res
-    String::new()
+    let path: String = format!("{}/{}/{}", GPIO_PATH, gpio, "value");
+    let res = read_file(path);
+    res
 }
 
-fn set_value(gpio: &str, value: i32) {
-    println!("Called set_value for GPIO {}", gpio);
+fn set_value(gpio: &str, value: f32) {
+    let path: String = format!("{}/{}/{}", GPIO_PATH, gpio, "value");
+    if !Path::new(&path).exists() {
+        print_information("Can't write to GPIO file. Value file does not exist");
+        return;
+    }
+    fs::write(&path, value.to_string()).expect("Error writing GPIO file");
 }
 
 fn get_label(gpio: &str) -> String {
-    println!("Called get_label for GPIO {}", gpio);
-    String::new()
+    let path: String = format!("{}/{}/{}", GPIO_PATH, gpio, "label");
+    let res = read_file(path);
+    res
 }
 
 fn print_information(message: &str) {
