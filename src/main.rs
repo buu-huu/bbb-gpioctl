@@ -12,7 +12,8 @@ use std::fs;
 use std::io::Read;
 use std::path::Path;
 
-const GPIO_PATH: &str = "/home/buuhuu/dev/rust/bbb/gpioctl";
+//const GPIO_PATH: &str = "/buuhuu/dev/rust/bbb/gpioctl/gpio"
+const GPIO_PATH: &str = "/sys/class/gpio";
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -24,10 +25,10 @@ fn main() {
     // Todo: Create Parser for available GPIOs from JSON file
     let mut available_gpios: Vec<Gpio> = vec![];
     available_gpios.push(
-        Gpio::new(String::from("gpio01"), 1, vec![Mode::Direction, Mode::Value])
+        Gpio::new(String::from("gpio66"), 1, vec![Mode::Direction, Mode::Value, Mode::Label])
     );
     available_gpios.push(
-        Gpio::new(String::from("gpio02"), 2, vec![Mode::Direction, Mode::Value, Mode::Label])
+        Gpio::new(String::from("gpio69"), 2, vec![Mode::Direction, Mode::Value, Mode::Label])
     );
 
     let gpio: &str = &args[1];
@@ -123,8 +124,10 @@ fn read_file(path: String) -> String {
 
 fn get_direction(gpio: &str) -> String {
     let path: String = format!("{}/{}/{}", GPIO_PATH, gpio, "direction");
-    let res = read_file(path);
-    res
+    let mut res = read_file(path);
+    res.pop();
+    let res = res.trim();
+    String::from(res)
 }
 
 fn set_direction(gpio: &str, direction: &str) {
@@ -138,11 +141,17 @@ fn set_direction(gpio: &str, direction: &str) {
 
 fn get_value(gpio: &str) -> String {
     let path: String = format!("{}/{}/{}", GPIO_PATH, gpio, "value");
-    let res = read_file(path);
-    res
+    let mut res = read_file(path);
+    res.pop();
+    let res = res.trim();
+    String::from(res)
 }
 
 fn set_value(gpio: &str, value: f32) {
+    if get_direction(gpio) == "in" {
+        print_information("Can't write value when direction is [IN]");
+        return;
+    }
     let path: String = format!("{}/{}/{}", GPIO_PATH, gpio, "value");
     if !Path::new(&path).exists() {
         print_information("Can't write to GPIO file. Value file does not exist");
