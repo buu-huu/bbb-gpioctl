@@ -149,6 +149,7 @@ fn get_value(gpio: &str) -> String {
 }
 
 fn set_value(gpio: &str, value: i32) {
+    // First, check, if direction is "out"
     if get_direction(gpio) == "in" {
         print_information("Can't write value when direction is [IN]");
         return;
@@ -163,8 +164,10 @@ fn set_value(gpio: &str, value: i32) {
 
 fn get_label(gpio: &str) -> String {
     let path: String = format!("{}/{}/{}", GPIO_PATH, gpio, "label");
-    let res = read_file(path);
-    res
+    let mut res = read_file(path);
+    res.pop();
+    let res = res.trim();
+    String::from(res)
 }
 
 fn print_information(message: &str) {
