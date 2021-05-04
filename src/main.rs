@@ -88,13 +88,14 @@ fn main() {
             set_direction(gpio, set_expression);
         }
         else if mode == "value" {
-            match set_expression.parse::<f32>() {
+            match set_expression.parse::<i32>() {
                 Ok(n) => {
-                    if n > 5.0 || n < 0.0 {
-                        print_information("Value must be between 0 and 5");
+                    if n == 0 || n == 1 {
+                        set_value(gpio, n)
+                    } else {
+                        print_information("Value must be 0 or 1");
                         return;
                     }
-                    set_value(gpio, n)
                 },
                 Err(_) => {
                     print_information("Please specify a number");
@@ -147,7 +148,7 @@ fn get_value(gpio: &str) -> String {
     String::from(res)
 }
 
-fn set_value(gpio: &str, value: f32) {
+fn set_value(gpio: &str, value: i32) {
     if get_direction(gpio) == "in" {
         print_information("Can't write value when direction is [IN]");
         return;
