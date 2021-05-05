@@ -238,6 +238,7 @@ pub fn get_system_gpios() -> Vec<Gpio> {
     available_gpios
 }
 
+#[derive(Clone)]
 pub struct Gpio {
     pub name: String,
     pub number: i32,
@@ -245,7 +246,7 @@ pub struct Gpio {
 }
 
 impl Gpio {
-    fn new(name: String, number: i32, modes: Vec<Mode>) -> Gpio {
+    pub fn new(name: String, number: i32, modes: Vec<Mode>) -> Gpio {
         let gpio: Gpio = Gpio {
             name: name,
             number: number,
@@ -255,6 +256,7 @@ impl Gpio {
     }
 }
 
+#[derive(Clone)]
 pub enum Mode {
     Direction,
     Value,

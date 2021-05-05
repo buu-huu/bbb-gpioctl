@@ -11,15 +11,10 @@ use std::fs;
 use std::io::Read;
 use std::path::Path;
 
-/*
+
 const GPIO_PATH: &str           = "/sys/class/gpio";
 const GPIO_EXPORT_PATH: &str    = "/sys/class/gpio/export";
-const GPIO_UNEXPORT_PATH: &str  = "/sys/class/gpio/unexport";
-*/
-const GPIO_PATH: &str           = "/home/buuhuu/dev/rust/bbb/bbb-gpioctl/gpio";
-const GPIO_EXPORT_PATH: &str    = "/home/buuhuu/dev/rust/bbb/bbb-gpioctl/gpio/export";
-//const GPIO_UNEXPORT_PATH: &str  = "/home/buuhuu/dev/rust/bbb/bbb-gpioctl/gpio/unexport";
-
+//const GPIO_UNEXPORT_PATH: &str  = "/sys/class/gpio/unexport";
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -29,9 +24,9 @@ fn main() {
     }
 
     let available_gpios = gpio::get_system_gpios();
-    let mut gpio_exported: bool = false;
+    //let mut gpio_exported: bool = false;
 
-    let gpio: &str = &args[1];
+    let gpio_name: &str = &args[1];
     let mode: &str = &args[2];
     let function: &str = &args[3];
     let mut set_expression: &str = "";
@@ -39,18 +34,20 @@ fn main() {
         set_expression = &args[4];
     }
 
-    let mut available_modes_gpio: Vec<&gpio::Mode> = vec![];
+    // Fill with dummy values, initializing below with actual values if gpio is available/correct
+    let mut gpio_selected: gpio::Gpio = gpio::Gpio {
+        name: String::from("none"),
+        number: 9999,
+        modes: vec![],
+    };
     
     // Check if specified GPIO is available and get modes
     let gpio_iter = available_gpios.iter();
     let mut gpio_found = false;
     for val in gpio_iter {
-        if gpio == val.name {
+        if gpio_name == val.name {
+            gpio_selected = val.clone();
             gpio_found = true;
-            let mode_iter = val.modes.iter();
-            for mode in mode_iter {
-                available_modes_gpio.push(mode);
-            }
             break;
         }
     }
@@ -58,27 +55,27 @@ fn main() {
         print_information("Invalid GPIO");
         return;
     }
-    
+
     if function != "get" && function != "set" {
         print_information("Invalid Function");
         return;
     }
 
-    if !Path::new(&format!("{}/{}", GPIO_PATH, gpio)).exists() {
-        export_gpio(gpio);
-        gpio_exported = true;
+    if !Path::new(&format!("{}/{}", GPIO_PATH, gpio_selected.name)).exists() {
+        export_gpio(gpio_selected.number);
+        //gpio_exported = true;
     }
 
     let res: String;
     if function == "get" {
         if mode == "direction" {
-            res = get_direction(gpio);
+            res = get_direction(&gpio_selected.name);
             println!("{}", res);
         } else if mode == "value" {
-            res = get_value(gpio);
+            res = get_value(&gpio_selected.name);
             println!("{}", res);
         } else if mode == "label" {
-            res = get_label(gpio);
+            res = get_label(&gpio_selected.name);
             println!("{}", res);
         } else {
             print_information("Please specify a correct mode");
@@ -90,13 +87,13 @@ fn main() {
                 print_information("Please use [in] or [out]");
                 return;
             }
-            set_direction(gpio, set_expression);
+            set_direction(&gpio_selected.name, set_expression);
         }
         else if mode == "value" {
             match set_expression.parse::<i32>() {
                 Ok(n) => {
                     if n == 0 || n == 1 {
-                        set_value(gpio, n)
+                        set_value(&gpio_selected.name, n)
                     } else {
                         print_information("Value must be 0 or 1");
                         return;
@@ -116,14 +113,14 @@ fn main() {
     }
 }
 
-fn export_gpio(gpio: &str) {
+fn export_gpio(gpio_number: i32) {
     let path: String = String::from(GPIO_EXPORT_PATH);
     if !Path::new(&path).exists() {
         print_information(&format!("Can't find export file. Looking for: {}", GPIO_EXPORT_PATH));
         return;
     }
-    fs::write(&path, gpio.to_string()).expect(&format!("Can't write '{}' to export file", gpio));
-    print_information(&format!("Exported {}", gpio));
+    fs::write(&path, gpio_number.to_string()).expect(&format!("Can't write '{}' to export file", gpio_number));
+    print_information(&format!("Exported GPIO number {}", gpio_number));
 }
 
 fn read_file(path: String) -> String {
