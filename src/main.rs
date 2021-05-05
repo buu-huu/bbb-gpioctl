@@ -12,7 +12,6 @@ use std::fs;
 use std::io::Read;
 use std::path::Path;
 
-//const GPIO_PATH: &str = "/buuhuu/dev/rust/bbb/gpioctl/gpio"
 const GPIO_PATH: &str = "/sys/class/gpio";
 
 fn main() {
@@ -125,8 +124,7 @@ fn read_file(path: String) -> String {
 
 fn get_direction(gpio: &str) -> String {
     let path: String = format!("{}/{}/{}", GPIO_PATH, gpio, "direction");
-    let mut res = read_file(path);
-    res.pop();
+    let res = read_file(path);
     let res = res.trim();
     String::from(res)
 }
@@ -142,8 +140,7 @@ fn set_direction(gpio: &str, direction: &str) {
 
 fn get_value(gpio: &str) -> String {
     let path: String = format!("{}/{}/{}", GPIO_PATH, gpio, "value");
-    let mut res = read_file(path);
-    res.pop();
+    let res = read_file(path);
     let res = res.trim();
     String::from(res)
 }
@@ -164,8 +161,7 @@ fn set_value(gpio: &str, value: i32) {
 
 fn get_label(gpio: &str) -> String {
     let path: String = format!("{}/{}/{}", GPIO_PATH, gpio, "label");
-    let mut res = read_file(path);
-    res.pop();
+    let res = read_file(path);
     let res = res.trim();
     String::from(res)
 }
