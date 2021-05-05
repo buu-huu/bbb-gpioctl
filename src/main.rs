@@ -4,9 +4,9 @@
  * Example call: gpioctl gpio01 [direction|value|label] [get|set]
  */
 
-use std::env;
+mod gpio;
 
-use std::fmt;
+use std::env;
 use std::fs::File;
 use std::fs;
 use std::io::Read;
@@ -21,14 +21,7 @@ fn main() {
         return;
     }
 
-    // Todo: Create Parser for available GPIOs from JSON file
-    let mut available_gpios: Vec<Gpio> = vec![];
-    available_gpios.push(
-        Gpio::new(String::from("gpio66"), 1, vec![Mode::Direction, Mode::Value, Mode::Label])
-    );
-    available_gpios.push(
-        Gpio::new(String::from("gpio69"), 2, vec![Mode::Direction, Mode::Value, Mode::Label])
-    );
+    let available_gpios = gpio::create_gpios();
 
     let gpio: &str = &args[1];
     let mode: &str = &args[2];
@@ -38,7 +31,7 @@ fn main() {
         set_expression = &args[4];
     }
 
-    let mut available_modes_gpio: Vec<&Mode> = vec![];
+    let mut available_modes_gpio: Vec<&gpio::Mode> = vec![];
     
     // Check if specified GPIO is available and get modes
     let gpio_iter = available_gpios.iter();
@@ -172,37 +165,4 @@ fn print_information(message: &str) {
 
 fn print_standard_error() {
     print_information("Specify at least 3 Arguments");
-}
-
-enum Mode {
-    Direction,
-    Value,
-    Label,
-}
-
-impl fmt::Display for Mode {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-       match *self {
-           Mode::Direction => write!(f, "Direction"),
-           Mode::Value     => write!(f, "Value"),
-           Mode::Label     => write!(f, "Label"),
-       }
-    }
-}
-
-struct Gpio {
-    name: String,
-    number: i32,
-    modes: Vec<Mode>,
-}
-
-impl Gpio {
-    fn new(name: String, number: i32, modes: Vec<Mode>) -> Gpio {
-        let gpio: Gpio = Gpio {
-            name: name,
-            number: number,
-            modes: modes,
-        };
-        gpio
-    }
 }
