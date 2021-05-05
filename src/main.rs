@@ -11,7 +11,15 @@ use std::fs;
 use std::io::Read;
 use std::path::Path;
 
-const GPIO_PATH: &str = "/sys/class/gpio";
+/*
+const GPIO_PATH: &str           = "/sys/class/gpio";
+const GPIO_EXPORT_PATH: &str    = "/sys/class/gpio/export";
+const GPIO_UNEXPORT_PATH: &str  = "/sys/class/gpio/unexport";
+*/
+const GPIO_PATH: &str           = "/home/buuhuu/dev/rust/bbb/bbb-gpioctl/gpio";
+const GPIO_EXPORT_PATH: &str    = "/home/buuhuu/dev/rust/bbb/bbb-gpioctl/gpio/export";
+//const GPIO_UNEXPORT_PATH: &str  = "/home/buuhuu/dev/rust/bbb/bbb-gpioctl/gpio/unexport";
+
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -21,6 +29,7 @@ fn main() {
     }
 
     let available_gpios = gpio::get_system_gpios();
+    let mut gpio_exported: bool = false;
 
     let gpio: &str = &args[1];
     let mode: &str = &args[2];
@@ -53,6 +62,11 @@ fn main() {
     if function != "get" && function != "set" {
         print_information("Invalid Function");
         return;
+    }
+
+    if !Path::new(&format!("{}/{}", GPIO_PATH, gpio)).exists() {
+        export_gpio(gpio);
+        gpio_exported = true;
     }
 
     let res: String;
@@ -100,6 +114,16 @@ fn main() {
     } else {
         print_information("Wrong function");
     }
+}
+
+fn export_gpio(gpio: &str) {
+    let path: String = String::from(GPIO_EXPORT_PATH);
+    if !Path::new(&path).exists() {
+        print_information(&format!("Can't find export file. Looking for: {}", GPIO_EXPORT_PATH));
+        return;
+    }
+    fs::write(&path, gpio.to_string()).expect(&format!("Can't write '{}' to export file", gpio));
+    print_information(&format!("Exported {}", gpio));
 }
 
 fn read_file(path: String) -> String {
