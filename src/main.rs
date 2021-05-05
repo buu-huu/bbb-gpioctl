@@ -1,7 +1,6 @@
 /*
  * GPIOCTL 
  * Provides functions to interact with the GPIOs of the BeagleBoneBlack
- * Example call: gpioctl gpio01 [direction|value|label] [get|set]
  */
 
 mod gpio;
