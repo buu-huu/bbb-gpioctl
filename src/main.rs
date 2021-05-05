@@ -20,7 +20,7 @@ fn main() {
         return;
     }
 
-    let available_gpios = gpio::create_gpios();
+    let available_gpios = gpio::get_system_gpios();
 
     let gpio: &str = &args[1];
     let mode: &str = &args[2];
