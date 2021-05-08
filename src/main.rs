@@ -2,6 +2,7 @@
  *
  * GPIOCTL 
  * Provides functions to interact with the GPIOs of the BeagleBoneBlack
+ * Author: buu-huu <github.com/buu-huu>
  * 
  * ****************************************************************************/
 
@@ -19,6 +20,10 @@ const GPIO_UNEXPORT_PATH: &str  = "/sys/class/gpio/unexport";
 
 fn main() {
     let args: Vec<String> = env::args().collect();
+    if &args[1] == "help" {
+        print_usage();
+        return;
+    }
     if args.len() < 4 {
         print_standard_error();
         return;
@@ -246,5 +251,25 @@ fn print_error(message: &str) {
 }
 
 fn print_standard_error() {
-    println!("[GPIOCTL] ERROR: Specify at least 3 Arguments");
+    println!("[GPIOCTL] ERROR: Specify at least 3 Arguments. Run 'gpioctl help' for usage");
+}
+
+fn print_usage() {
+    let usage_string = r#"
+        [GPIOCTL]
+        Author: buu-huu <github.com/buu-huu>
+
+        Usage:
+            - gpioctl help          Prints this help
+            
+            - gpioctl [gpio]        [mode] [function] [(value)]
+                gpio                Name of the GPIO
+                mode                Operation mode [direction|value|label]
+                function            Function of the mode [get|set]
+                value               Value if function 'set' was used
+            
+        Example call
+            - gpioctl gpio66 direction get
+    "#;
+    println!("{}", usage_string);
 }
