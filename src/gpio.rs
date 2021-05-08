@@ -192,7 +192,7 @@ pub fn get_system_gpios() -> Vec<Gpio> {
 
 
     available_gpios.push(
-        Gpio::new(String::from("gpio70"), 700, vec![Mode::Direction, Mode::Value, Mode::Label])
+        Gpio::new(String::from("gpio70"), 70, vec![Mode::Direction, Mode::Value, Mode::Label])
     );
     available_gpios.push(
         Gpio::new(String::from("gpio71"), 71, vec![Mode::Direction, Mode::Value, Mode::Label])
