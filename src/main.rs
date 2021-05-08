@@ -48,6 +48,9 @@ fn main() {
     if &args[1] == "help" {
         print_usage();
         return;
+    } else if &args[1] == "list" {
+        print_gpios();
+        return;
     }
     if args.len() < 4 {
         print_error("Sepecify at least 3 arguments. 'gpioctl help' for usage");
@@ -280,8 +283,9 @@ fn print_usage() {
 
         Usage:
             - gpioctl help          Prints this help
+            - gpioctl list          Lists all available GPIOs
             
-            - gpioctl [gpio]        [mode] [function] [(value)]
+            - gpioctl [gpio] [mode] [function] [(value)]
                 gpio                Name of the GPIO
                 mode                Operation mode [direction|value|label]
                 function            Function of the mode [get|set]
@@ -291,4 +295,12 @@ fn print_usage() {
             - gpioctl gpio66 direction get
     "#;
     println!("{}", usage_string);
+}
+
+fn print_gpios() {
+    let available_gpios = gpio::get_system_gpios();
+    println!("NAME\tNUMBER\n");
+    for gpio in available_gpios.iter() {
+        println!("{}\t{}", gpio.name, gpio.number);
+    }
 }
