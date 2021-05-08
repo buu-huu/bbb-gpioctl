@@ -160,8 +160,8 @@ fn get_direction(gpio_number: i32, gpio: &str) -> String {
 
 fn set_direction(gpio_number: i32, gpio: &str, direction: &str) {
     let mut exported: bool = false;
-    if !Path::new(&format!("{}/{}", GPIO_PATH, gpio)).exists() {    // If GPIO folder already exists, don't
-        export_gpio(gpio_number);                                   // export GPIO
+    if !Path::new(&format!("{}/{}", GPIO_PATH, gpio)).exists() {
+        export_gpio(gpio_number);
         exported = true;
     }
     let path: String = format!("{}/{}/{}", GPIO_PATH, gpio, "direction");
@@ -171,7 +171,7 @@ fn set_direction(gpio_number: i32, gpio: &str, direction: &str) {
     }
     fs::write(&path, direction).expect("Error writing GPIO file");
 
-    if exported {                                                   // Only unexport when we exported first
+    if exported {
         unexport_gpio(gpio_number);
     }
     print_information("Direction set");
@@ -179,15 +179,15 @@ fn set_direction(gpio_number: i32, gpio: &str, direction: &str) {
 
 fn get_value(gpio_number: i32, gpio: &str) -> String {
     let mut exported: bool = false;
-    if !Path::new(&format!("{}/{}", GPIO_PATH, gpio)).exists() {    // If GPIO folder already exists, don't
-        export_gpio(gpio_number);                                   // export GPIO
+    if !Path::new(&format!("{}/{}", GPIO_PATH, gpio)).exists() {
+        export_gpio(gpio_number);
         exported = true;
     }
     let path: String = format!("{}/{}/{}", GPIO_PATH, gpio, "value");
     let res = read_file(path);
     let res = res.trim();
 
-    if exported {                                                   // Only unexport when we exported first
+    if exported {
         unexport_gpio(gpio_number);
     }
     String::from(res)
@@ -195,8 +195,8 @@ fn get_value(gpio_number: i32, gpio: &str) -> String {
 
 fn set_value(gpio_number: i32, gpio: &str, value: i32) {
     let mut exported: bool = false;
-    if !Path::new(&format!("{}/{}", GPIO_PATH, gpio)).exists() {    // If GPIO folder already exists, don't
-        export_gpio(gpio_number);                                   // export GPIO
+    if !Path::new(&format!("{}/{}", GPIO_PATH, gpio)).exists() {
+        export_gpio(gpio_number);
         exported = true;
     }
     // First, check, if direction is "out"
@@ -211,7 +211,7 @@ fn set_value(gpio_number: i32, gpio: &str, value: i32) {
     }
     fs::write(&path, value.to_string()).expect("Error writing GPIO file");
 
-    if exported {                                                   // Only unexport when we exported first
+    if exported {
         unexport_gpio(gpio_number);
     }
     print_information("Value set");
@@ -219,15 +219,15 @@ fn set_value(gpio_number: i32, gpio: &str, value: i32) {
 
 fn get_label(gpio_number: i32, gpio: &str) -> String {
     let mut exported: bool = false;
-    if !Path::new(&format!("{}/{}", GPIO_PATH, gpio)).exists() {    // If GPIO folder already exists, don't
-        export_gpio(gpio_number);                                   // export GPIO
+    if !Path::new(&format!("{}/{}", GPIO_PATH, gpio)).exists() {
+        export_gpio(gpio_number);
         exported = true;
     }
     let path: String = format!("{}/{}/{}", GPIO_PATH, gpio, "label");
     let res = read_file(path);
     let res = res.trim();
 
-    if exported {                                                   // Only unexport when we exported first
+    if exported {
         unexport_gpio(gpio_number);
     }
     String::from(res)
