@@ -1,7 +1,9 @@
-/*
+/* *****************************************************************************
+ *
  * GPIOCTL 
  * Provides functions to interact with the GPIOs of the BeagleBoneBlack
- */
+ * 
+ * ****************************************************************************/
 
 mod gpio;
 
@@ -11,10 +13,9 @@ use std::fs;
 use std::io::Read;
 use std::path::Path;
 
-
 const GPIO_PATH: &str           = "/sys/class/gpio";
 const GPIO_EXPORT_PATH: &str    = "/sys/class/gpio/export";
-//const GPIO_UNEXPORT_PATH: &str  = "/sys/class/gpio/unexport";
+const GPIO_UNEXPORT_PATH: &str  = "/sys/class/gpio/unexport";
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -24,7 +25,6 @@ fn main() {
     }
 
     let available_gpios = gpio::get_system_gpios();
-    //let mut gpio_exported: bool = false;
 
     let gpio_name: &str = &args[1];
     let mode: &str = &args[2];
@@ -61,21 +61,18 @@ fn main() {
         return;
     }
 
-    if !Path::new(&format!("{}/{}", GPIO_PATH, gpio_selected.name)).exists() {
-        export_gpio(gpio_selected.number);
-        //gpio_exported = true;
-    }
+    
 
     let res: String;
     if function == "get" {
         if mode == "direction" {
-            res = get_direction(&gpio_selected.name);
+            res = get_direction(gpio_selected.number, &gpio_selected.name);
             println!("{}", res);
         } else if mode == "value" {
-            res = get_value(&gpio_selected.name);
+            res = get_value(gpio_selected.number, &gpio_selected.name);
             println!("{}", res);
         } else if mode == "label" {
-            res = get_label(&gpio_selected.name);
+            res = get_label(gpio_selected.number, &gpio_selected.name);
             println!("{}", res);
         } else {
             print_information("Please specify a correct mode");
@@ -87,13 +84,13 @@ fn main() {
                 print_information("Please use [in] or [out]");
                 return;
             }
-            set_direction(&gpio_selected.name, set_expression);
+            set_direction(gpio_selected.number, &gpio_selected.name, set_expression);
         }
         else if mode == "value" {
             match set_expression.parse::<i32>() {
                 Ok(n) => {
                     if n == 0 || n == 1 {
-                        set_value(&gpio_selected.name, n)
+                        set_value(gpio_selected.number, &gpio_selected.name, n)
                     } else {
                         print_information("Value must be 0 or 1");
                         return;
@@ -123,6 +120,16 @@ fn export_gpio(gpio_number: i32) {
     print_information(&format!("Exported GPIO number {}", gpio_number));
 }
 
+fn unexport_gpio(gpio_number: i32) {
+    let path: String = String::from(GPIO_UNEXPORT_PATH);
+    if !Path::new(&path).exists() {
+        print_information(&format!("Can't find unexport file. Looking for: {}", GPIO_EXPORT_PATH));
+        return;
+    }
+    fs::write(&path, gpio_number.to_string()).expect(&format!("Can't write '{}' to unexport file", gpio_number));
+    print_information(&format!("Unexported GPIO number {}", gpio_number));
+}
+
 fn read_file(path: String) -> String {
     let f = File::open(path);
     let mut f = match f {
@@ -135,32 +142,64 @@ fn read_file(path: String) -> String {
     s
 }
 
-fn get_direction(gpio: &str) -> String {
+fn get_direction(gpio_number: i32, gpio: &str) -> String {
+    let mut exported: bool = false;
+    if !Path::new(&format!("{}/{}", GPIO_PATH, gpio)).exists() {    // If GPIO folder already exists, don't
+        export_gpio(gpio_number);                                   // export GPIO
+        exported = true;
+    }
     let path: String = format!("{}/{}/{}", GPIO_PATH, gpio, "direction");
     let res = read_file(path);
     let res = res.trim();
+
+    if exported {                                                   // Only unexport when we exported first
+        unexport_gpio(gpio_number);
+    }
     String::from(res)
 }
 
-fn set_direction(gpio: &str, direction: &str) {
+fn set_direction(gpio_number: i32, gpio: &str, direction: &str) {
+    let mut exported: bool = false;
+    if !Path::new(&format!("{}/{}", GPIO_PATH, gpio)).exists() {    // If GPIO folder already exists, don't
+        export_gpio(gpio_number);                                   // export GPIO
+        exported = true;
+    }
     let path: String = format!("{}/{}/{}", GPIO_PATH, gpio, "direction");
     if !Path::new(&path).exists() {
         print_information("Can't write to GPIO file. Direction file does not exist");
         return;
     }
     fs::write(&path, direction).expect("Error writing GPIO file");
+
+    if exported {                                                   // Only unexport when we exported first
+        unexport_gpio(gpio_number);
+    }
 }
 
-fn get_value(gpio: &str) -> String {
+fn get_value(gpio_number: i32, gpio: &str) -> String {
+    let mut exported: bool = false;
+    if !Path::new(&format!("{}/{}", GPIO_PATH, gpio)).exists() {    // If GPIO folder already exists, don't
+        export_gpio(gpio_number);                                   // export GPIO
+        exported = true;
+    }
     let path: String = format!("{}/{}/{}", GPIO_PATH, gpio, "value");
     let res = read_file(path);
     let res = res.trim();
+
+    if exported {                                                   // Only unexport when we exported first
+        unexport_gpio(gpio_number);
+    }
     String::from(res)
 }
 
-fn set_value(gpio: &str, value: i32) {
+fn set_value(gpio_number: i32, gpio: &str, value: i32) {
+    let mut exported: bool = false;
+    if !Path::new(&format!("{}/{}", GPIO_PATH, gpio)).exists() {    // If GPIO folder already exists, don't
+        export_gpio(gpio_number);                                   // export GPIO
+        exported = true;
+    }
     // First, check, if direction is "out"
-    if get_direction(gpio) == "in" {
+    if get_direction(gpio_number, gpio) == "in" {
         print_information("Can't write value when direction is [IN]");
         return;
     }
@@ -170,12 +209,25 @@ fn set_value(gpio: &str, value: i32) {
         return;
     }
     fs::write(&path, value.to_string()).expect("Error writing GPIO file");
+
+    if exported {                                                   // Only unexport when we exported first
+        unexport_gpio(gpio_number);
+    }
 }
 
-fn get_label(gpio: &str) -> String {
+fn get_label(gpio_number: i32, gpio: &str) -> String {
+    let mut exported: bool = false;
+    if !Path::new(&format!("{}/{}", GPIO_PATH, gpio)).exists() {    // If GPIO folder already exists, don't
+        export_gpio(gpio_number);                                   // export GPIO
+        exported = true;
+    }
     let path: String = format!("{}/{}/{}", GPIO_PATH, gpio, "label");
     let res = read_file(path);
     let res = res.trim();
+
+    if exported {                                                   // Only unexport when we exported first
+        unexport_gpio(gpio_number);
+    }
     String::from(res)
 }
 
