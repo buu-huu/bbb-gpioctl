@@ -33,6 +33,10 @@
 
 mod gpio;
 
+extern crate termion;
+
+use termion::{color};
+
 use std::env;
 use std::fs::File;
 use std::fs;
@@ -273,7 +277,7 @@ fn print_result(message: &str) {
 }
 
 fn print_error(message: &str) {
-    println!("[GPIOCTL] ERROR: {}", message);
+    println!("{}[GPIOCTL] ERROR: {}{}", color::Fg(color::Red), message, color::Fg(color::White));
 }
 
 fn print_usage() {
