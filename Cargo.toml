@@ -1,5 +1,6 @@
 [package]
 name = "gpioctl"
+description = "Interface for controlling GPIOs on the BeagleBone Black"
 version = "0.1.0"
 authors = ["buuhuu"]
 edition = "2018"
