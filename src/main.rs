@@ -67,13 +67,13 @@ fn main() {
     if function == "get" {
         if mode == "direction" {
             res = get_direction(gpio_selected.number, &gpio_selected.name);
-            println!("{}", res);
+            print_result(&res);
         } else if mode == "value" {
             res = get_value(gpio_selected.number, &gpio_selected.name);
-            println!("{}", res);
+            print_result(&res);
         } else if mode == "label" {
             res = get_label(gpio_selected.number, &gpio_selected.name);
-            println!("{}", res);
+            print_result(&res);
         } else {
             print_information("Please specify a correct mode");
             return;
@@ -90,7 +90,7 @@ fn main() {
             match set_expression.parse::<i32>() {
                 Ok(n) => {
                     if n == 0 || n == 1 {
-                        set_value(gpio_selected.number, &gpio_selected.name, n)
+                        set_value(gpio_selected.number, &gpio_selected.name, n);
                     } else {
                         print_information("Value must be 0 or 1");
                         return;
@@ -174,6 +174,7 @@ fn set_direction(gpio_number: i32, gpio: &str, direction: &str) {
     if exported {                                                   // Only unexport when we exported first
         unexport_gpio(gpio_number);
     }
+    print_information("Direction set");
 }
 
 fn get_value(gpio_number: i32, gpio: &str) -> String {
@@ -213,6 +214,7 @@ fn set_value(gpio_number: i32, gpio: &str, value: i32) {
     if exported {                                                   // Only unexport when we exported first
         unexport_gpio(gpio_number);
     }
+    print_information("Value set");
 }
 
 fn get_label(gpio_number: i32, gpio: &str) -> String {
@@ -233,6 +235,10 @@ fn get_label(gpio_number: i32, gpio: &str) -> String {
 
 fn print_information(message: &str) {
     println!("[BUSCTL] {}", message);
+}
+
+fn print_result(message: &str) {
+    println!("[BUSCTL] Result: {}", message);
 }
 
 fn print_standard_error() {
