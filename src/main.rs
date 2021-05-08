@@ -25,7 +25,7 @@ fn main() {
         return;
     }
     if args.len() < 4 {
-        print_standard_error();
+        print_error("Sepecify at least 3 arguments. 'gpioctl help' for usage");
         return;
     }
 
@@ -65,8 +65,6 @@ fn main() {
         print_error("Invalid Function");
         return;
     }
-
-    
 
     let res: String;
     if function == "get" {
@@ -248,10 +246,6 @@ fn print_result(message: &str) {
 
 fn print_error(message: &str) {
     println!("[GPIOCTL] ERROR: {}", message);
-}
-
-fn print_standard_error() {
-    println!("[GPIOCTL] ERROR: Specify at least 3 Arguments. Run 'gpioctl help' for usage");
 }
 
 fn print_usage() {
