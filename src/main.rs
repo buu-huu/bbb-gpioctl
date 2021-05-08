@@ -52,12 +52,12 @@ fn main() {
         }
     }
     if !gpio_found {
-        print_information("Invalid GPIO");
+        print_error("Invalid GPIO");
         return;
     }
 
     if function != "get" && function != "set" {
-        print_information("Invalid Function");
+        print_error("Invalid Function");
         return;
     }
 
@@ -75,13 +75,13 @@ fn main() {
             res = get_label(gpio_selected.number, &gpio_selected.name);
             print_result(&res);
         } else {
-            print_information("Please specify a correct mode");
+            print_error("Please specify a correct mode");
             return;
         }
     } else if function == "set" {
         if mode == "direction" {
             if set_expression != "in" && set_expression != "out" {
-                print_information("Please use [in] or [out]");
+                print_error("Please use [in] or [out]");
                 return;
             }
             set_direction(gpio_selected.number, &gpio_selected.name, set_expression);
@@ -92,28 +92,28 @@ fn main() {
                     if n == 0 || n == 1 {
                         set_value(gpio_selected.number, &gpio_selected.name, n);
                     } else {
-                        print_information("Value must be 0 or 1");
+                        print_error("Value must be 0 or 1");
                         return;
                     }
                 },
                 Err(_) => {
-                    print_information("Please specify a number");
+                    print_error("Please specify a number");
                     return;
                 }
             }
         } else {
-            print_information("Please specify correct mode");
+            print_error("Please specify correct mode");
             return;
         }
     } else {
-        print_information("Wrong function");
+        print_error("Please specify a correct function");
     }
 }
 
 fn export_gpio(gpio_number: i32) {
     let path: String = String::from(GPIO_EXPORT_PATH);
     if !Path::new(&path).exists() {
-        print_information(&format!("Can't find export file. Looking for: {}", GPIO_EXPORT_PATH));
+        print_error(&format!("Can't find export file. Looking for: {}", GPIO_EXPORT_PATH));
         return;
     }
     fs::write(&path, gpio_number.to_string()).expect(&format!("Can't write '{}' to export file", gpio_number));
@@ -123,7 +123,7 @@ fn export_gpio(gpio_number: i32) {
 fn unexport_gpio(gpio_number: i32) {
     let path: String = String::from(GPIO_UNEXPORT_PATH);
     if !Path::new(&path).exists() {
-        print_information(&format!("Can't find unexport file. Looking for: {}", GPIO_EXPORT_PATH));
+        print_error(&format!("Can't find unexport file. Looking for: {}", GPIO_EXPORT_PATH));
         return;
     }
     fs::write(&path, gpio_number.to_string()).expect(&format!("Can't write '{}' to unexport file", gpio_number));
@@ -166,7 +166,7 @@ fn set_direction(gpio_number: i32, gpio: &str, direction: &str) {
     }
     let path: String = format!("{}/{}/{}", GPIO_PATH, gpio, "direction");
     if !Path::new(&path).exists() {
-        print_information("Can't write to GPIO file. Direction file does not exist");
+        print_error("Can't write to GPIO file. Direction file does not exist");
         return;
     }
     fs::write(&path, direction).expect("Error writing GPIO file");
@@ -201,12 +201,12 @@ fn set_value(gpio_number: i32, gpio: &str, value: i32) {
     }
     // First, check, if direction is "out"
     if get_direction(gpio_number, gpio) == "in" {
-        print_information("Can't write value when direction is [IN]");
+        print_error("Can't write value when direction is [IN]");
         return;
     }
     let path: String = format!("{}/{}/{}", GPIO_PATH, gpio, "value");
     if !Path::new(&path).exists() {
-        print_information("Can't write to GPIO file. Value file does not exist");
+        print_error("Can't write to GPIO file. Value file does not exist");
         return;
     }
     fs::write(&path, value.to_string()).expect("Error writing GPIO file");
@@ -234,13 +234,17 @@ fn get_label(gpio_number: i32, gpio: &str) -> String {
 }
 
 fn print_information(message: &str) {
-    println!("[BUSCTL] {}", message);
+    println!("[GPIOCTL] {}", message);
 }
 
 fn print_result(message: &str) {
-    println!("[BUSCTL] Result: {}", message);
+    println!("[GPIOCTL] Result: {}", message);
+}
+
+fn print_error(message: &str) {
+    println!("[GPIOCTL] ERROR: {}", message);
 }
 
 fn print_standard_error() {
-    print_information("Specify at least 3 Arguments");
+    println!("[GPIOCTL] ERROR: Specify at least 3 Arguments");
 }
