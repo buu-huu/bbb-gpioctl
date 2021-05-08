@@ -1,12 +1,13 @@
 [package]
 name = "gpioctl"
-description = "Interface for controlling GPIOs on the BeagleBone Black"
+description = "CLI for controlling GPIOs on the BeagleBone Black"
 version = "0.1.0"
 authors = ["buuhuu"]
 edition = "2018"
 repository = "https://github.com/buu-huu/bbb-gpioctl"
 license = "MIT"
 keywords = ["gpio"]
+readme = "README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
