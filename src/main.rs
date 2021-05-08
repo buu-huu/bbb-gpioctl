@@ -49,6 +49,10 @@ const GPIO_UNEXPORT_PATH: &str  = "/sys/class/gpio/unexport";
 
 fn main() {
     let args: Vec<String> = env::args().collect();
+    if args.len() < 2 {
+        print_error("Sepecify at least 3 arguments. 'gpioctl help' for usage");
+        return;
+    }
     if &args[1] == "help" {
         print_usage();
         return;
