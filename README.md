@@ -1,6 +1,23 @@
 # BeagleBone Black GPIO Control
 
-The gpioctl interface provides an easy way to communicate with the BBB's GPIO pins. In `/sys/class/gpio/` you can find folders for GPIOs on the BBB. This program gives an easy command line interface for controling the GPIOs.
+The gpioctl interface provides an easy way to communicate with the BeagleBone Blacks GPIO pins.
+
+In `/sys/class/gpio/` you can find folders for GPIOs on the BBB. This program gives an easy command line interface for controling the GPIOs, instead of reading and writing to these files directly.
+
+## How it works
+
+Pretty easy: You could just open a GPIO folder, for example `/sys/class/gpio/gpio7`. In that folder, you find a few files. E.g.:
+
+* direction
+* value
+
+These files are special files. You can read from them or simply write to some of them to change and read values or directions. GPIOCTL provides an easy command line interface to handle all the (complex) stuff in the background for you. Examples:
+
+* Check, if the GPIO is available for the desired operations on the BBB
+* Export and unexport the GPIO before accessing it
+* Plausibility checks (e.g. setting a value while the direction is set to "in" makes no sense)
+
+All these features make life easier when working with the GPIOs of the BBB. It's planned, to implement additional helpful modes such as PWM output in GPIOCTL.
 
 ## Usage
 
