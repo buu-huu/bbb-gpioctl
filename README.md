@@ -103,3 +103,5 @@ List all available GPIOs via
 ```
 $ gpioctl list
 ```
+
+Currently, not all GPIOs are available. In future, we want to provide access to all GPIOs on the BeagleBone Black.
