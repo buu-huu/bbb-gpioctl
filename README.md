@@ -92,7 +92,7 @@ $ cargo deb --target armv7-unknown-linux-musleabihf
 
 The package will be located under `target/armv7-unknown-linux-musleabihf/debian`.
 
-Install it with
+Install it on the BeagleBone Black with
 
 ```console
 $ sudo dpkg -i <package-name>
