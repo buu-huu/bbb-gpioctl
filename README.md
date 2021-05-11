@@ -62,7 +62,7 @@ $ export CARGO_TARGET_ARMV7_UNKNOWN_LINUX_MUSLEABIHF_LINKER=arm-linux-gnueabihf-
 Finally, build the executable:
 
 ```console
-$ cargo build --target --release armv7-unknown-linux-musleabihf
+$ cargo build --release --target armv7-unknown-linux-musleabihf
 ```
 
 The executable program is located in `target/armv7-unknown-linux-musleabihf/release`
