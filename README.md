@@ -39,7 +39,7 @@ The argument `value` only needs to be used when using the function `set`.
 | `label`     | `get`    | Returns the label of the GPIO                                 |
 
 
-## Installation
+## Building
 
 Make sure, you install the gcc ARM compiler and linker first:
 
