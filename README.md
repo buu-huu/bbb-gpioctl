@@ -38,6 +38,9 @@ The argument `value` only needs to be used when using the function `set`.
 |             | `set`    | Sets the value of the GPIO (0/1), GPIO direction must be in   |
 | `label`     | `get`    | Returns the label of the GPIO                                 |
 
+## Requirements
+
+There are no requirements for GPIOCTL on the BeagleBone Black.
 
 ## Building
 
