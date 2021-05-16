@@ -95,11 +95,15 @@ $ cargo deb --target armv7-unknown-linux-musleabihf
 
 The package will be located under `target/armv7-unknown-linux-musleabihf/debian`.
 
-Install it on the BeagleBone Black with
+## Installation
+
+Install the Debian Package on the BeagleBone Black with
 
 ```console
 $ sudo dpkg -i <package-name>
 ```
+
+where `package-name` is the name of the previously built `.deb` file. Alternatively, you can install a pre-built release from this repository.
 
 ## GPIOs
 List all available GPIOs via
